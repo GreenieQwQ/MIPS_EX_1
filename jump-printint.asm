@@ -20,8 +20,14 @@ main:
 	nop
 
 
-.global printint #only positive
+.global printint #only positive 用到$s0/1/2/3调用时压栈保存
 printint:
+    addi $sp, $sp, -16 #保存$s0/1/2/3 无递归调用不保存$ra
+    sw  $s3, 12($sp)
+    sw  $s2, 8($sp)
+    sw  $s1, 4($sp)
+    sw  $s0, 0($sp) 
+
     la $s3, printbuf
     sw $zero, 0($s3)
     sw $zero, 4($s3)
@@ -57,8 +63,14 @@ while2:
     bne $s2, $zero, while2
     nop
 done2:
+    lw  $s0, 0($sp)
+    lw  $s1, 4($sp)
+    lw  $s2, 8($sp)
+    lw  $s3, 12($sp)
+    addi $sp, $sp, 16    #恢复现场
     jr $ra
     nop
+
 
 .global printline #输出一个空行
 printline:
