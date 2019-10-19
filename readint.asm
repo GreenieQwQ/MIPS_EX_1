@@ -25,9 +25,10 @@ main:
 	nop
 
 
-.global readint #用到$s0, $s1,调用时需压栈保存
+.global readint #用到 $s0/1、$t0 调用时需压栈保存
 readint: #去除空格/换行后读取数字直到再次遇见空格换行为止 //仅无符号数字有效 若EOF返回-1
-    addi $sp, $sp, -8 #保存$s0和$s1 无递归调用不保存$ra
+    addi $sp, $sp, -12 #保存 $s0/1、$t0 无递归调用不保存$ra
+    sw  $t0, 8($sp)
     sw  $s1, 4($sp)
     sw  $s0, 0($sp) 
 ri_while_1:    
@@ -94,7 +95,8 @@ ri_EOF:
 readint_exit:       
     lw  $s0, 0($sp)
     lw  $s1, 4($sp)
-    addi $sp, $sp, 8    #恢复现场
+    lw  $t0, 8($sp)
+    addi $sp, $sp, 12    #恢复现场
     jr $ra
     nop
 
