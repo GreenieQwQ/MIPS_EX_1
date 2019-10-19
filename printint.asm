@@ -20,9 +20,11 @@ main:
 	nop
 
 
-.global printint #only positive 用到$s0/1/2/3调用时压栈保存
+.global printint #only positive 用到$s0/1/2/3、$t0/1调用时压栈保存
 printint:
-    addi $sp, $sp, -16 #保存$s0/1/2/3 无递归调用不保存$ra
+    addi $sp, $sp, -24 #保存$s0/1/2/3 无递归调用不保存$ra
+    sw  $t1, 20($sp)
+    sw  $t0, 16($sp)
     sw  $s3, 12($sp)
     sw  $s2, 8($sp)
     sw  $s1, 4($sp)
@@ -37,9 +39,9 @@ printint:
     li $s1, 1 # quotient
     li $s2, 0 # significant_bit
 
-    beq $s1, $zero, done1 #if(quotient == 0) done
+    beq $s1, $zero, pi_done1 #if(quotient == 0) done
     nop
-while1:  
+pi_while1:  
     addi $t0, $zero, 10  # $t0 = 10
     div		$a0, $t0	# $a0 / 10 
     mflo	$s1		# $s1 = floor($a0 / 10) 
@@ -49,10 +51,10 @@ while1:
     sb $s0, 0($t1) # buf[ significant_bit ] = remainder + '0'
     addi $s2, $s2, 1 # significant_bit ++
     move $a0, $s1 # a /= 10
-    bne  $s1, $zero, while1
+    bne  $s1, $zero, pi_while1
     nop
-done1:
-while2:
+pi_done1:
+pi_while2:
     addi $s2, $s2, -1  # significant_bit--
     add $t1, $s3, $s2 # $t1 = &buf[ significant_bit ]
     li $v0, 4004
@@ -60,14 +62,16 @@ while2:
     move $a1, $t1 
     li $a2, 1
     syscall
-    bne $s2, $zero, while2
+    bne $s2, $zero, pi_while2
     nop
-done2:
+pi_done2:
     lw  $s0, 0($sp)
     lw  $s1, 4($sp)
     lw  $s2, 8($sp)
     lw  $s3, 12($sp)
-    addi $sp, $sp, 16    #恢复现场
+    lw  $t0, 16($sp)
+    lw  $t1, 20($sp)
+    addi $sp, $sp, 24    #恢复现场
     jr $ra
     nop
 
