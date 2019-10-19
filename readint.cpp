@@ -41,24 +41,5 @@ void printint( int a )
 
 int main()
 {
-    int condition;
-    int nowscore = 1;
-    int totalscore = 0;
-    condition = readint(); 
-    while( condition != 0 && condition != -1 )
-    { 
-        if( condition == 1 )
-            nowscore = 1;
-        else    //condition == 2
-        {
-            if( nowscore == 1 )
-                nowscore = 2;
-            else
-                nowscore += 2;
-        }
-        
-        totalscore += nowscore;
-        condition = readint(); 
-    }    
-    printint(totalscore);
+    printint( readint() );
 }
